@@ -9,25 +9,40 @@ class BookTransaction extends React.Component {
     this.state = {
       hasCameraPermissions: null,
       scanned: false,
-      scannedData: '',
+      scannedStudentID: '',
+      scannedBookID:'',
       buttonState: 'normal',
     };
   }
 
-  getCameraPermission = async () => {
+  getCameraPermission = async (id) => {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({
       hasCameraPermissions: status === "granted",
-      buttonState: 'clicked'
+      buttonState: id,
+      scanned:false
     });
   };
 
   handleBarCodeScanned = async ({ type, data }) => {
-    this.setState({
+    var id=this.state.buttonState
+    if(id==='studentID'){
+       this.setState({
       scanned: true,
-      scannedData: data,
+      scannedStudentID: data,
       buttonState: 'normal',
     });
+    }
+    else if(id==='bookID'){
+      this.setState({
+      scanned: true,
+      scannedBookID: data,
+      buttonState: 'normal',
+    });
+    }
+    
+    
+    
   };
 
   render() {
@@ -35,7 +50,7 @@ class BookTransaction extends React.Component {
     const bs = this.state.buttonState;
     const scanned = this.state.scanned;
 
-    if (bs === 'clicked' && cp) {
+    if (bs !== 'normal' && cp) {
       console.log(bs)
       return (
         
@@ -52,23 +67,23 @@ class BookTransaction extends React.Component {
         <View style={[styles.scan1,{marginTop:150,alignSelf:'center'}]}>
             <TextInput style={styles.input}
             placeholder='Book Id'
-             value={this.state.scannedData}
+             value={this.state.scannedBookID}
             >
           </TextInput>
            <TouchableOpacity
             style={styles.button}
-            onPress= {this.getCameraPermission}>
+            onPress= {()=>this.getCameraPermission('bookID')}>
             <Text>Scan</Text>
           </TouchableOpacity>
         </View>
           <View style={[styles.scan1,{marginTop:-150,alignSelf:'center'}]}>
           <TextInput style={styles.input}
           placeholder='Student Id'
-          value={this.state.scannedData}>
+          value={this.state.scannedStudentID}>
           </TextInput>
           <TouchableOpacity
             style={styles.button}
-            onPress= {this.getCameraPermission}>
+            onPress= {()=>this.getCameraPermission('studentID')}>
             <Text>Scan</Text>
           </TouchableOpacity>
           </View>
